@@ -87,6 +87,7 @@ class TestTrackAnalyzer:
         mock_analysis_result = AudioAnalysisResult(
             file_path='/test/track.mp3',
             duration=240.0,
+            sample_rate=44100,
             bpm=130.0,
             key='C major',
             energy_level=0.8,
@@ -117,6 +118,8 @@ class TestTrackAnalyzer:
         # Mock failed audio analysis
         failed_result = AudioAnalysisResult(
             file_path='/test/track.mp3',
+            duration=0.0,
+            sample_rate=44100,
             success=False,
             error_message='Analysis failed'
         )
