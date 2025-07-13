@@ -1,0 +1,32 @@
+# MusicFlow Organizer Dependencies
+# Professional Music Library Organization Tool for DJs
+
+# GUI Framework
+PySide6>=6.5.0
+
+# Audio Playback
+PySide6-Addons>=6.5.0  # For QtMultimedia
+
+# Audio Analysis
+librosa>=0.10.0
+essentia-tensorflow>=2.1b6.dev1110  # Optional: Advanced audio analysis
+soundfile>=0.12.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+numpy>=1.24.0
+
+# Metadata Handling
+mutagen>=1.47.0
+
+# Utilities
+pathlib2>=2.3.7  # For Python 3.7 compatibility
+typing-extensions>=4.0.0  # For dataclass features
+
+# Optional: Enhanced audio formats support
+pymediainfo>=6.0.0  # For advanced media info
+pydub>=0.25.0  # For audio format conversion
+
+# Development/Testing (optional)
+pytest>=7.0.0
+pytest-qt>=4.0.0

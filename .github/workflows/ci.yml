@@ -1,0 +1,138 @@
+name: 🎧 MusicFlow CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # Fase 1: Verificación de calidad de código
+  code-quality:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+        
+    - name: 🎨 Check code formatting
+      run: |
+        poetry run black --check src/ *.py
+        poetry run isort --check-only src/ *.py
+        
+    - name: 🔍 Lint code
+      run: |
+        poetry run flake8 src/ *.py
+        poetry run mypy src/ --ignore-missing-imports
+        poetry run pydocstyle src/ --convention=google
+        
+    - name: 🔒 Security scan
+      run: |
+        poetry run bandit -r src/ --severity-level medium
+        poetry run safety check
+
+  # Fase 2: Pruebas unitarias
+  unit-tests:
+    name: 🧪 Unit Tests
+    needs: code-quality
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+        
+    - name: 🧪 Run unit tests
+      run: |
+        poetry run pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=term-missing
+        
+    - name: 📊 Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Fase 3: Pruebas de integración
+  integration-tests:
+    name: 🔗 Integration Tests
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+        
+    - name: 🎵 Install audio libraries
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsndfile1 ffmpeg
+        
+    - name: 🔗 Run integration tests
+      run: |
+        poetry run pytest tests/integration/ -v
+        
+    - name: 🎧 Run DJ workflow tests
+      run: |
+        poetry run python test_app.py
+
+  # Notificación de resultados
+  notify:
+    name: 📢 Attribution Notice
+    needs: [integration-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📢 BlueSystemIO Attribution
+      run: |
+        echo "🔷 Este software está basado en código desarrollado por BlueSystemIO"
+        echo "📧 Para consultas: support@bluesystemio.com"
+        echo "🌐 Más información: https://bluesystemio.com"
+        echo ""
+        echo "✅ Recuerda incluir la atribución requerida en tu distribución pública"
+        echo "📋 Ver ATTRIBUTION.md para más detalles"
