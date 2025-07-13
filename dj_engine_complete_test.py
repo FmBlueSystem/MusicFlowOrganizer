@@ -139,11 +139,12 @@ class DJEngineCompleteTester:
             
             # Mock API keys for testing
             'musicbrainz_user_agent': 'DJEngineTest/1.0',
-            'discogs_token': 'test_token',
-            'spotify_client_id': 'test_client_id',
-            'spotify_client_secret': 'test_client_secret',
-            'lastfm_api_key': 'test_api_key',
-            'openai_api_key': 'test_openai_key',
+            # SECURITY: Use environment variables for API keys (even in tests)
+            'discogs_token': os.getenv('TEST_DISCOGS_TOKEN', 'mock_discogs_token'),
+            'spotify_client_id': os.getenv('TEST_SPOTIFY_CLIENT_ID', 'mock_spotify_id'),
+            'spotify_client_secret': os.getenv('TEST_SPOTIFY_SECRET', 'mock_spotify_secret'),
+            'lastfm_api_key': os.getenv('TEST_LASTFM_API_KEY', 'mock_lastfm_key'),
+            'openai_api_key': os.getenv('TEST_OPENAI_API_KEY', 'mock_openai_key'),
             
             # Weights
             'weight_discogs': 0.30,

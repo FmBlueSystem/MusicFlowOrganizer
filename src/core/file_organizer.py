@@ -26,6 +26,7 @@ from collections import defaultdict
 from .mixinkey_integration import MixInKeyIntegration, MixInKeyTrackData
 from .genre_classifier import GenreClassifier, GenreClassificationResult
 from .audio_analyzer import AudioAnalyzer, AudioAnalysisResult
+from .security_utils import validate_file_path, sanitize_filename, is_safe_file_operation, SecurityError
 
 
 class OrganizationScheme(Enum):

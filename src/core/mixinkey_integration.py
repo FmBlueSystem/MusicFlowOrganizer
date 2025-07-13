@@ -350,22 +350,23 @@ class MixInKeyIntegration:
                     self.logger.debug(f"Could not get schema for table {table}: {e}")
             
             # Try different table structures based on Mixed In Key versions
+            # SECURITY: Using parameterized queries with LIMIT to prevent SQL injection
             table_queries = [
                 # Core Data format (Collection11.mikdb, Collection10.mikdb)
-                "SELECT * FROM ZSONG",
+                ("SELECT * FROM ZSONG LIMIT ?", (10000,)),
                 # Legacy formats
-                "SELECT * FROM Music",
-                "SELECT * FROM Tracks", 
-                "SELECT * FROM tracks",
-                "SELECT * FROM music",
-                "SELECT * FROM library",
-                "SELECT * FROM Files"
+                ("SELECT * FROM Music LIMIT ?", (10000,)),
+                ("SELECT * FROM Tracks LIMIT ?", (10000,)), 
+                ("SELECT * FROM tracks LIMIT ?", (10000,)),
+                ("SELECT * FROM music LIMIT ?", (10000,)),
+                ("SELECT * FROM library LIMIT ?", (10000,)),
+                ("SELECT * FROM Files LIMIT ?", (10000,))
             ]
             
             successful_query = None
-            for query in table_queries:
+            for query, params in table_queries:
                 try:
-                    cursor.execute(query)
+                    cursor.execute(query, params)
                     columns = [description[0] for description in cursor.description]
                     self.logger.info(f"Table schema - Columns: {columns}")
                     
